@@ -1,0 +1,13 @@
+/* switch-error03.100 */
+/* Function can return without passing return statement */
+
+int main()
+{
+  int x;
+  x = getint();
+  switch (x) {
+    case 42: putstring("Life, universe and everything."); return 0;
+    case 13: break;
+    default : return 0;
+  }
+}

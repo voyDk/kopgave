@@ -1,0 +1,11 @@
+/* except-error01.100 */
+/* Non-integer exception value */
+
+int main()
+{
+  int *x;
+  try
+    throw x;
+  catch y: return 1;
+  return 0;
+}

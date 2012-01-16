@@ -1,0 +1,14 @@
+/* switch-error02.100 */
+/* Break outside loop or switch */
+
+int main()
+{
+  int x;
+  x = getint();
+  break;
+  switch (x) {
+    case 42: putstring("Life, universe and everything.");
+    default : putint(0);
+  }
+  return 0;
+}

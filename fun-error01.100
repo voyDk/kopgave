@@ -1,0 +1,16 @@
+/* fun-error01.100 */
+/* mistyped function value assignment */
+
+int main()
+{
+  int x();
+
+  x = g;
+
+  return 0;
+}
+
+char g()
+{
+  return 42;
+}

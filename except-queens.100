@@ -1,0 +1,44 @@
+/* except-queens.100 */
+/* solves the n-queens problem */
+
+int main()
+{
+  int n, *board;
+
+  n = getint();
+  board = walloc(n);
+  try
+    solve(board,n-1,n);
+  catch solved:
+    while (0<n) {
+      n = n-1;
+      putint(board[n]);
+    }
+  return 0;
+}
+
+int solve(int *board, n,size)
+{
+  int i;
+
+  if (n<0) throw 0;
+  i = 0;
+  while (i<size) {
+    if (noConflict(i,1,board,n+1,size)) {
+      board[n] = i;
+      solve(board,n-1,size);
+    }
+    i = i+1;
+  }
+  return 0;
+}
+
+int noConflict(int i, delta,*board, n,size)
+{
+  if (n==size) return 1; /* no conflict found */
+  if (board[n] == i) return 0;  /* same row */
+  if (board[n] == i+delta) return 0;  /* same diagonal 1 */
+  if (board[n] == i-delta) return 0;  /* same diagonal 2 */
+  return noConflict(i,delta+1,board,n+1,size);
+}
+  

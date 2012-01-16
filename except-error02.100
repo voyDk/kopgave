@@ -1,0 +1,15 @@
+/* except-error02.100 */
+/* should compile without errors
+   but write run-time error message indicating
+   an uncaught exception with the value 42. */
+
+int main()
+{
+  return f(getint());
+}
+
+int f(int i)
+{
+  if (i==0) throw 42;
+  else return f(i-1);
+}

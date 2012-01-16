@@ -1,0 +1,21 @@
+/* except-find.100 */
+/* searches for lower-case letter in string */
+
+int main()
+{
+  char *s;
+
+  s = balloc(2);
+  s[1] = 0;
+  try
+    find(getstring(100));
+  catch c : {s* = c; putstring(s);}
+  return 0;
+}
+
+int find(char *s)
+{
+  if (s*==0) return 0;
+  else if ((s*<'a') + ('z'<s*)) return find(s+1);
+  else throw s*;
+}

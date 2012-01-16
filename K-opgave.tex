@@ -1,0 +1,655 @@
+\documentclass[a4paper,11pt]{article}
+
+\usepackage[latin1]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{pslatex}
+\usepackage[danish]{babel}
+
+\title{Udvidelser af oversætter for 100}
+
+\author{Karakteropgave på kurset Oversættere}
+
+\date{Vinter 2011}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduktion\label{intro}}
+
+Dette er den karaktergivende eksamensopgave på Oversættere, vinter 2011.
+Opgaven skal løses individuelt.  Opgaven bliver stillet mandag d.\
+16/1 2011 og skal afleveres via Absalon senest fredag d.\ 20/1 2011
+kl. 23.55.
+
+En forudsætning for at lave denne K-opgaver er, at man har enten et
+tidligere år har opnået eksamensberettigelse eller dette år fået
+godkendt G-opgaven samt opnået godkendelse af fire ud af de fem
+ugeopgaver.
+
+Der er stillet fem alternative opgaver.  Det er et krav, at
+studerende, der har været i samme gruppe til G-opgaven, skal vælge
+forskellige opgaver i K-opgaven.  Der trækkes lod om
+førstevælgerretten på følgende måde: Herunder er angivet en
+permutation af tallene fra 1 til 31.  Alle gruppemedlemmer finder
+deres fødselsdato (dag i måneden) i listen, og det gruppemedlem, hvis
+fødselsdato står først i listen, vælger først og så fremdeles.  Hvis
+to gruppemedlemmer har samme fødselsdato gentages processen med
+månedsnummeret.  Hvis dette også er det samme, så kontakt den
+kursusansvarlige (Torben), som vil rulle en stor terning.
+
+\vspace{1ex}
+25 4 8 13 11 3 10 20 6 2 30 16 23 24 18 1
+
+29 31 27 7 5 14 19 22 9 17 15 12 28 21 26
+
+\vspace{1ex}
+\noindent
+Hvis I ikke kan få kontakt til alle jeres gruppemedlemmer inden mandag
+d.\ 16/1 kl.\ 15.00, så kontakt den kursusansvarlige (Torben), som så
+vil finde en løsning.
+
+Hvis du har opnået eksamensberettigelse et tidligere år, og derfor
+ikke har en gruppe i år, kan du frit vælge din opgave uden
+lodtrækning, også selv om nogle af dine G-opgave gruppemedlemmer fra
+tidligere år også deltager i denne eksamen.
+
+\section{Om opgaven}
+
+Opgaven går ud på at udvide den oversætter for sproget 100, som
+er beskrevet i G-opgaven.
+
+Som hjælp hertil er der givet en implementering af G-opgaven, som er
+afprøvet til at virke for de til G-opgaven udleverede testprogrammer.
+Du kan også vælge at bruge din egen eller en anden gruppes
+implementering af G-opgaven eller kombinere flere.  Under alle
+omstændigheder, skal rapporten klart angve, hvilken implementering af
+G-opgaven, der bruges som udgangspunkt.
+
+På eksamensopgavesiden i Absalon findes en zip-fil med opgaveteksten
+(som du læser nu), filer til implementering af G-opgaven samt
+testprogrammer til udvidelserne i denne eksamensopgave (se
+afsnit~\ref{opgaverne}).
+
+Det er nødvendigt at modificere/udvide følgende filer:
+ 
+\begin{description}
+
+\item[\texttt{S100.sml}] Datatypeerklæringer for den abstrakte syntaks
+  for 100.
+
+\item[\texttt{Parser.grm}] Grammatikken for 100 med parseraktioner, der
+  opbygger den abstrakte syntaks.
+
+\item[\texttt{Lexer.lex}] Leksikalske definitioner for {\em tokens} i
+  100.
+
+\item[\texttt{Type.sml}] Typechecker for 100.
+
+\item[\texttt{Compiler.sml}] Oversætter fra 100 til MIPS assembler.
+  Oversættelsen sker direkte fra 100 til MIPS uden brug af
+  mellemkode.
+
+\end{description}
+
+\noindent
+I nogle tilfælde kan det være nødvendigt eller fordelagtigt at
+modificere andre moduler.  Hvis du gør dette, så begrund det i
+rapporten.
+
+Til oversættelse af ovennævnte moduler (inklusive de moduler, der ikke
+skal ændres) bruges Moscow-ML oversætteren inklusive værktøjerne
+MosML-lex og MosML-yacc.  \texttt{Compiler.sml} bruger datastruktur og
+registerallokator for en delmængde af MIPS instruktionssættet.  Filen
+\texttt{compile} indeholder kommandoer for oversættelse af de nødvendige
+moduler.  Der vil optræde nogle {\em warnings} fra compileren.  Disse
+kan ignoreres, men vær opmærksom på evt.\ nye fejlmeddelelser eller
+advarsler, når I retter i filerne.
+
+Til afvikling af de oversatte MIPS programmer bruges simulatoren MARS.
+
+Dine programmer bliver evalueret ved kørsel på DIKUs systemer.  Da der
+kan være små forskelle i opførslen af Moscow ML og MARS på forskellige
+platforme, vil det være en god ide, at verificere, at din løsning kan
+køre korrekt på DIKUs systemer, inden du afleverer den.  Ellers
+risikerer du, at din løsning bliver bedømt som ikke-virkende, selv om
+du kunne køre den på din egen maskine.
+
+\subsection*{Krav til besvarelsen}
+
+Besvarelsen skal være en rapport i PDF-format samt en zip-fil
+bestående af alle kildetekster, inklusive ekstra testprogrammer og
+deres inddata.
+
+Rapportens forside skal tydeligt angive opgaveløserens fulde navn, KU
+indentitet (svensk nummerplade) og CPR-nummer samt navn og nummer på
+den valgte opgave.
+
+Rapporten skal indeholde en kort beskrivelse af de ændringer, der
+laves i ovenstående komponenter.  Beskrivelsen skal begrunde alle
+væsentlige valg omkring design og implementering af løsningen.
+
+For \texttt{Parser.grm} skal der kort forklares hvordan grammatikken er
+gjort entydig (ved omskrivning eller brug af
+operatorpræcedenserklæringer) samt beskrivelse af eventuelle
+ikke-åbenlyse løsninger, f.eks.\ i forbindelse med opbygning af
+abstrakt syntaks. Det skal bemærkes, at alle konflikter skal fjernes
+v.h.a.\ præcedenserklæringer eller omskrivning af syntaks.  Med andre
+ord må MosML-yacc {\em ikke} rapportere konflikter i tabellen.
+
+For \texttt{Type.sml} og \texttt{Compiler.sml} skal kort beskrives, hvordan
+typerne checkes og kode genereres for de nye konstruktioner.  Suppler
+evt.\ beskrivelserne med figurer i stil med figur~5.2 og 6.3 i {\em
+  Introduction to Compiler Design}.
+
+Du behøver ikke inkludere hele programteksterne i rapportteksten, men
+du skal inkludere de væsentligt ændrede eller tilføjede dele af
+programmerne i rapportteksten som figurer, bilag e.lign.  Hvis der
+henvises til kildetekst i en vedlagt fil, skal filens navn og
+linjenumrene på den omtalte del angives.  Bilag i form af kode tæller
+ikke med til sidebegrænsningen, men det anbefales alligevel kun at
+vedlægge de ændrede dele af programteksterne.
+
+Rapporten skal beskrive hvorvidt oversættelse og kørsel af
+testprogrammer (jvf.\ afsnit~\ref{eksempelprogrammer}) giver den
+forventede opførsel, samt beskrivelse af afvigelser derfra.  Testens
+resultat skal vurderes, og evt.\ mangler i testen skal beskrives.
+Ekstra testprogrammer, der afhjælper de vigtigste mangler, skal laves
+og køres.
+
+Kendte mangler i typechecker og oversætter skal beskrives, og i det
+omfang det er muligt, skal det skitseres, hvordan disse kan udbedres.
+
+Rapporten skal ikke alene \emph{beskrive}, hvordan du har løst
+opgaven, den skal også \emph{evaluere}, hvor godt denne løsning
+fungerer.
+
+Det er i stort omfang op til dig selv at bestemme, hvad du mener er
+væsentligt at medtage i rapporten, sålænge de eksplicitte krav i dette
+afsnit er opfyldt.
+
+Rapporten bør ikke fylde mere end 10 sider (ekslusive forside), dog
+uden at udelade de eksplicitte krav såsom beskrivelser af mangler i
+programmet og væsentlige designvalg.
+
+
+\subsection{Afgrænsninger af oversætteren}
+
+Det er helt i orden, at lexer, parser, typechecker og oversætter
+stopper ved den første fundne fejl.
+
+Oversætteren kan antage, at programmerne har passeret typecheckeren,
+så det er ikke nødvendigt igen at checke disse ting.
+
+Det kan antages, at de oversatte programmer er små nok til, at alle
+hopadresser kan ligge i konstantfelterne i branch- og hopordrer.
+
+Det er ikke nødvendigt at frigøre lager på hoben mens programmet
+kører.  Der skal ikke laves test for overløb på stak eller hob.  Den
+faktiske opførsel ved overløb er udefineret, så om der sker fejl under
+afvikling eller oversættelse, eller om der bare beregnes mærkelige
+værdier, er underordnet.
+
+\subsection{MosML-Lex og MosML-yacc}
+
+Beskrivelser af disse værktøjer findes i Moscow ML's Owners Manual,
+som kan hentes via kursets hjemmeside. Yderligere information samt
+installationer af systemet til Windows og Linux findes på Moscow ML's
+hjemmeside (følg link fra kursets hjemmeside, i afsnittet om
+programmel).  Desuden er et eksempel på brug af disse værktøjer
+beskrevet i en note, der kan findes i \texttt{Lex+Parse.zip}, som er
+tilgængelig via kursets hjemmeside.
+
+\section{Abstrakt syntaks og oversætter}
+
+Filen \texttt{S100.sml} angiver datastrukturer for den abstrakte syntaks
+for programmer i 100.  Hele programmet har type \texttt{100.Prog}.
+
+Filen \texttt{C100.sml} indeholder kildeteksten til et program, der kan
+indlæse, typechecke og oversætte et 100-program.  Dette program kaldes
+ved at angive filnavnet for programmet (uden extension) på
+kommandolinien, f.eks. \texttt{C100 fib}.  Extension for 100-programmer
+er \texttt{.100}, f.eks.\ \texttt{fib.100}.  Når 100-programmet er indlæst
+og typechecket, skrives den oversatte kode ud på en fil med samme navn
+som programmet men med extension \texttt{.asm}.  Kommandoen ``\texttt{C100
+  fib}'' vil altså tage en kildetekst fra filen \texttt{fib.100} og
+skrive kode ud i filen \texttt{fib.asm}.
+
+Den symbolske oversatte kode kan indlæses og køres af MARS.
+Kommandoen ``\texttt{java -jar Mars.jar fib.asm}'' vil køre programmet og
+læse inddata fra standard input og skrive uddata til standard output.
+Mars kan også køres interaktivt, men så skal man selv taste input ind
+i i/o-vinduet.  Brug ikke copy/paste med musen, da det giver forkerte
+resultater.
+
+Typecheckeren er implementeret i filerne \texttt{Type.sig} og {\tt
+Type.sml}.  Oversætteren er implementeret i filerne \texttt{Compiler.sig}
+og \texttt{Compiler.sml}.
+
+Hele oversætteren kan genoversættes (inklusive generering af lexer og
+parser) ved at skrive \texttt{source compile.sh} på kommandolinien (mens man
+er i et katalog med alle de relevante filer, inclusive \texttt{compile.sh}).
+
+Hvis du kører i et Windows-miljø kan du bruge \texttt{compile.bat}, som
+adskiller sig fra \texttt{compile.sh} ved at sætte \texttt{.exe} på den
+eksekverbare \texttt{C100}-fil.
+
+\section{Testprogrammer\label{eksempelprogrammer}}
+
+Udover de i hver opgave angivne testprogrammer, skal alle
+testprogrammer fra G-opgaven kunne oversættes og køres med den nye
+oversætter eller give (type-) fejl\-med\-del\-el\-ser ligesom før.
+
+Hvert eksempelprogram {\em program}\texttt{.100} (som ikke skal give
+typefejl) skal kunne oversættes og køres på inddata, der er givet i
+filen {\em program}\texttt{.in}.  Uddata fra kørslen af et program
+skal stemme overens med det, der er givet i filen {\em
+  program}\texttt{.out} (undtaget forskelle i versionsbeskeden fra
+MARS).  Hvis der ikke er nogen {\em program}\texttt{.in} fil, køres
+programmet uden inddata.
+
+Der er endvidere givet et antal testprogrammer (med tegnfølgen
+\texttt{error} i filnavnet), der indeholder diverse typefejl eller
+andre inkonsistenser.  For hvert program skal der meldes en relevant
+fejlmeddelelse og angives omtrentlig position i programmet for fejlen.
+Hvis ikke der er en \texttt{.in} fil til et \texttt{error} program,
+skal typecheckeren melde fejl.  Hvis der er en \texttt{.in} til
+programmet, skal programmet kunne oversættes uden typefejl, men skal
+give en fejlmeddelelse som output.  Der er i dette tilfælde ikke givet
+nogen \texttt{.out} fil, da formulering og positionsangivelser kan
+variere.
+
+Testprogrammerne kan de på ingen måde siges at være en udtømmende
+test.  Man skal vurdere, om der er ting i oversætteren, der ikke er
+testet, og lave yderligere testprogrammer efter behov.
+  
+\section{Vink}
+
+\begin{itemize}
+
+\item Hvis du har spørgsmål til opgaven, så brug debatforummet.  Der
+  er flere, der kan hjælpe dig, og andre kan få glæde af de svar, du
+  får.  Du må ikke bede om hjælp til egentlig løsning af opgaverne,
+  men du kan stille opklarende spørgsmål om opgaven, og du kan spørge
+  om SML, MosML-lex, MosML-yac, MARS osv.  Hvis der er et specifikt
+  problem, der betyder, at du ikke kan komme videre, så bed Torben om
+  hjælp.  Husk at skrive i rapporten, at du fik denne hjælp.
+  
+\item Hvis du er i tvivl om den eksakte betydning af den udvidelse, du
+  skal implementere, kan også du bruge testprogrammerne som guide:
+  Hvis din fortolkning af semantikken ikke giver det samme uddata, som
+  testprogrammernes \texttt{.out} filer, så er din tolkning (eller
+  implementering) nok forkert.  Hvis dette ikke er nok til at afklare
+  spørgsmålet, så beskriv din tolkning af betydningen.  Se også første
+  vink herover.
+
+\end{itemize}
+
+\noindent
+Se endvidere vinkene i G-opgaven.
+
+\section{Opgaverne}\label{opgaverne}
+
+Hver eksaminand skal vælge {\'e}n af følgende fem opgaver jvf.\
+proceduren for valg af opgave, som er beskrevet i
+afsnit~\ref{intro}.
+
+Besvarelsen afleveres i Absalon.  Rapporten bør uploades som separat
+fil, og kodefiler m.m.\ uploades som en zip-fil.
+
+Afleveringsfristen bør overholdes.  Overskridelser vil som minimum gå
+ud over karakteren, og signifikante overskridelser vil medføre
+resultatet ``Udeblevet''.\newpage
+
+\subsection{Opgave 1: Switch og break}
+
+Syntaksen af 100 udvides med følgende produktioner:
+
+\[\begin{array}{lcl}
+  Stat &\rightarrow& \texttt{switch~(}~Exp~\texttt{)~\{}~Cases~\texttt{\}}\\
+  Stat &\rightarrow& \texttt{break~;}\\[1ex]
+
+Cases &\rightarrow& \texttt{default~:}~Stats\\
+Cases &\rightarrow&
+\texttt{case}~ConstExp~\texttt{:}~Stats~Cases\\[1ex]
+
+ConstExp &\rightarrow& \textbf{numConst} \\
+ConstExp &\rightarrow& \textbf{charConst}
+\end{array}\]
+
+\subsubsection{Semantik}
+
+En sætning af formen $\texttt{switch~(}e\texttt{)~\{}~cs\texttt{\}}$
+udregner $e$ til et heltal $n$.  Hvis der i $cs$ er en gren af formen
+$\texttt{case}~k\texttt{:} ss~cs'$, hvor værdien af $k$ er lig med $n$
+udføres $ss$ efterfulgt af alle sætninger i $cs'$ (eller indtil et
+\texttt{break}, se herunder).  Hvis ikke, udføres sætningen efter
+\texttt{default:}.  Bemærk, at $k$ kan være enten en heltalskonstant
+eller en tegnkonstant.  $e$ skal have typen \texttt{int}.  Der må ikke
+være to grene (\texttt{case}\ldots) med samme værdi (hvor en
+tegnkonstant har sin ASCII-værdi).  Begge dele skal checkes af
+typecheckeren.
+
+Semantikken af en sætning af formen \texttt{break;} afhænger af, hvor
+den står:
+
+\begin{enumerate}
+\item Hvis \texttt{break;} står inde i kroppen af en løkke (dvs.\ i
+  $s$ i en sætning af formen $\texttt{while~(}e\texttt{)}~s$),
+  forlades løkken og koden lige efter løkken udføres.
+\item Hvis \texttt{break;} står inde i en \texttt{switch}-sætning
+  (dvs.\ i $cs$ i en sætning af formen
+  $\texttt{switch~(}e\texttt{)~\{}cs\texttt{\}}$), forlades
+  \texttt{switch}-sætningen og koden lige efter denne udføres.
+\item Hvis \texttt{break;} ikke står i hverken eller, er det en fejl,
+  som skal rapporteres.  Se endvidere vinket længere nede.
+\item Hvis \texttt{break;} står inde i flere indlejrede sætninger
+  (\texttt{while} eller \texttt{switch}), er det kun den inderste af
+  disse, der forlades.
+\end{enumerate}
+
+\noindent
+Semantikken for begge sætningstyper er ligesom i C (hvis C's
+\texttt{switch}-sætning indskrænkes til den herover viste form).
+
+Bemærk, at testen for, om en funktion altid returnerer med en
+\texttt{return}-sætning, skal tage højde for \texttt{switch} og
+\texttt{break}.  \textbf{Vink}: En sætning kan returnere på tre måder:
+Normalt (ved at nå slutningen af sætningen), med \texttt{return} eller
+med \texttt{break}.  Find for hver sætning mængden af mulige
+returmåder, og brug denne information om delsætninger til at finde
+informationen om hele sætningen.  For eksempel kan en while-løkke
+altid returnere normalt, aldrig med \texttt{break} og med
+\texttt{return} kun hvis kroppen kan.
+
+\subsubsection{Opgavens art}
+
+Der er lidt mere typecheck end kodegenerering.
+
+\subsubsection{Testprogrammer}
+
+Testprogrammer til opgave 1 starter med \texttt{switch}, f.eks.\ {\tt
+  switch-sort.100} og\newline \texttt{switch-error01.100}.  Se endvidere
+afsnit~\ref{eksempelprogrammer}.\newpage
+
+
+\subsection{Opgave 2: Funktionsreferencer}
+
+Syntaksen af 100 udvides med følgende produktion:
+
+\[ Sid ~\rightarrow~ \textbf{id}~\texttt{(~)}\]
+
+\noindent
+Denne udvidelse gør ikke grammatikken tvetydig (udover, hvad der er
+håndteret med præcedenserklæringer i G-opgaveløsningen), men den
+introducerer en \emph{shift/reduce} konflikt, der skyldes manglende
+\emph{lookahead} i parseren.
+
+Denne konflikt skal løses med omskrivning af grammatikken -- den kan
+ikke løses med præcedenserklæringer.  Vink: Opdel produktionerne for
+$FunDecs$ i flere specialtilfælde.
+
+\subsubsection{Semantik}
+
+Funktioner og variable deler i denne udvidelse navnerum, så en
+variabel med navn $f$ kan ``skygge for'' en funktion med samme navn.
+En ny type værdi er en funktionsreference.  Hvis et funktionsnavn i et
+udtryk bruges uden en efterfølgende parameterliste, er det et udtryk,
+der returnerer en funktionsreference (dvs.\ adressen på funktionens
+kode).  En $Sid$ af formen $f$() erklærer $f$ til at være en
+funktionsreference.  Erklæringen
+
+\begin{verbatim}
+int x, f(), *y;
+\end{verbatim}
+
+\noindent
+erklærer for eksempel tre variable: \verb`x`, der er et heltal,
+\verb`f`, der er en reference til en funktion, der returnerer et
+heltal og \verb`y`, der er en heltalsreference.  Bemærk, at
+parametrenes typer ikke specificeres ved erklæringer af
+funktionsreferencer.
+
+En variabel, der er en funktionsreference, kan tildeles en værdi, som
+er en funktionsreference med samme type (igen uden hensyn til
+parameterenes typer).  Hvis der f.eks.\ er en funktion erklæret som
+
+\begin{verbatim}
+int g(int p, *q) {...}
+\end{verbatim}
+
+\noindent
+vil tildelingen \verb`f = g` give \verb`` en værdi, der er en
+reference til \verb`g`.  Oversætteren skal checke, at returtyperne af
+\verb`f` og \verb`g` stemmer overens, men da erklæringen af \verb`f`
+ikke specificerer argumenternes typer, skal der ikke checkes for
+overenstemmelse med disse.  Man kan ikke lave en tildeling, der
+overskriver en globalt erklæret funktion, så \verb`g = f` vil i
+ovenstående tilfælde være ulovligt.  Dette skal checkes af
+oversætteren.
+
+Et funktionskald har stadig formen $f(\cdots)$, men $f$ kan nu være
+enten en global funktion eller en variabel, der har
+funktionsreferencetype.  Hvis $f$ er en global funktion, skal der
+(ligesom før) checkes, at argumenternes antal og type stemmer overens
+med erklæringen, men hvis $f$ er en funktionsreferencevariabel (som jo
+ikke angiver parametertyper), antages det, at argumenternes antal og
+typer passer.  Det er udefineret, hvad der sker på køretid, hvis $f$
+ikke er initialiseret eller hvis $f$ peger på en funktion med et andet
+antal eller typer af parametre end kaldet.  Resultattypen af kaldet er
+som angivet i $f$'s type.
+
+Funktionsreferencer kan frit overføres som parametre eller returneres
+som funktionsresultater.
+
+\subsubsection{Opgavens art}
+
+Der skal elimineres en ikke-triviel \emph{shift/reduce} konflikt i
+parseren.  Derudover er der omtrent lige dele typecheck og
+kodegenerering.
+
+\subsubsection{Testprogrammer}
+
+Testprogrammer til opgave 2 starter med \texttt{fun}, f.eks.\ {\tt
+  fun-map.100} og\newline \texttt{fun-error01.100}.  Se endvidere
+afsnit~\ref{eksempelprogrammer}.\newpage
+
+
+
+\subsection{Opgave 3: Globale variable og generelle referencer}
+
+Syntaksen af 100 udvides med følgende produktion:
+
+\[\begin{array}{lcl}
+  FunDecs &\rightarrow& Dec~\texttt{;}~ FunDecs
+\end{array}\]
+
+\noindent
+og produktionen
+
+\[\begin{array}{lcl}
+ Sid &\rightarrow& \texttt{*}~\textbf{id}
+\end{array}\]
+
+\noindent
+erstattes med
+
+\[\begin{array}{lcl}
+ Sid &\rightarrow& \texttt{*}~Sid
+\end{array}\]
+
+\noindent
+Endvidere tilføjes nogle prædefinerede allokerings funktioner, der
+alle virker ligesom \texttt{walloc} (de kan altså bruge samme kode),
+men hvor resultattyperne er anderledes: \texttt{cralloc} returnerer en
+reference til en tegnreference og \texttt{iralloc} returnerer en
+reference til en heltalsreference.  \texttt{cralloc} kan f.eks.\
+bruges til at allokere en tabel af strings.
+
+\subsubsection{Semantik}
+
+Der kan nu erklæres globale variable på samme måde som lokale variable
+(selv om nonterminalen hedder $FunDecs$ erklæres nu både funktioner og
+variable).  Alle globale variable er tilgængelige i alle funktioner,
+men kan ``skygges'' af lokale variable og parametre på samme måde som
+lokale variable kan skygge for parametre og andre lokale variable.
+Der må ikke erklæres flere globale variable med samme navn.  Dette
+skal checkes.
+
+Semantisk set fungerer en global variabel ligesom en lokal variabel,
+bortset fra, at den netop er global og bevarer sin værdi hen over
+funktionskald og -retur.  Det anbefales, at globale variable lægges i
+lageret frem for i registre jvf.\ \emph{Introduction to Compiler
+  Design} afsnit 9.9.1.
+
+Endvidere kan der nu være referencer til referencer.  Erklæringen
+
+\begin{verbatim}
+int ***x;
+\end{verbatim}
+
+\noindent
+erklærer f.eks.\ \texttt{x} til at være en reference til en reference
+til en reference til et heltal.  Referencer fylder 32-bit, så
+operationer på referencer til referencer fungerer ligesom operationer
+på referencer til heltal (dog skal typerne matche på den oplagte måde,
+så man ikke kan trække to forskellige referencetyper fra
+hinanden osv.).
+
+\subsubsection{Opgavens art}
+
+Der er lidt mindre typecheck end kodegenerering.
+
+\subsubsection{Testprogrammer}
+
+Testprogrammer til opgave 3 starter med \texttt{global}, f.eks.\ {\tt
+  global-sort.100} og\newline \texttt{global-error01.100}.  Se endvidere
+afsnit~\ref{eksempelprogrammer}.\newpage
+
+
+
+\subsection{Opgave 4: Void og \&}
+
+Syntaksen af 100 udvides med følgende produktioner
+
+\[\begin{array}{lcl}
+  Type  &\rightarrow& \texttt{void} \\[1ex]
+
+  Stat &\rightarrow& \texttt{return ;} \\[1ex]
+
+  Exp  &\rightarrow& \texttt{\&}~Lval
+\end{array}\]
+
+\subsubsection{Semantik}
+
+Typen \texttt{void} kan kun bruges som resultattype af en funktion --
+hverken udtryk, parametre eller lokale variable kan have denne type
+(hvilket typecheckeren skal sikre).  Typen \texttt{void} indikerer, at
+funktionen \emph{ikke} returnerer nogen værdi.  Det betyder, at
+funktionen i stedet for at returnere med en sætning af formen
+\texttt{return~$e$;} skal returnere med en sætning af formen
+\texttt{return;} \emph{eller} ved at nå slutningen af
+funktionskroppen.  Der må altså ikke i kroppen være en sætning af
+formen \texttt{return~$e$;}.  Dette skal checkes.
+
+Operatoren \texttt{\&} returnerer adressen af den $Lval$, den står
+foran.  Eksempelvis vil udtrykket \texttt{\&a[3]} returnere adressen
+på det fjerde element i tabellen \texttt{a} og \texttt{\&x} vil
+returnere adressen på variablen \texttt{x}.  Bemærk, at dette tvinger
+\texttt{x} til at ligge i lageret (på kaldstakken), da registre ikke
+har adresser.  Se endvidere Afsnit 9.9.2 i\ \emph{Introduction to
+  Compiler Design}.
+
+I udtrykket \texttt{\&$m$} skal $m$ have typen \texttt{int} eller
+\texttt{char} og udtrykket vil følgelig være en reference til hhv.\ et
+heltal eller et tegn.  F.eks.\ vil følgende kodebid være lovlig:
+
+\begin{verbatim}
+int x, *y;
+y = &x;
+\end{verbatim}
+
+\noindent
+mens udtrykket \texttt{\&y} i denne kontekst ikke vil være lovlig, da
+resultatet vil være en reference til en reference til et heltal,
+hvilket ikke er en lovlig type i 100.
+
+\subsubsection{Opgavens art}
+
+Der er overvægt af kodegenerering.  Specielt skal der findes en
+mekanisme til at sørge for at variable, hvis adresser bliver taget med
+\texttt{\&}-operatoren, ligger i lageret.  Vink: Brug evt.\
+registerallokatoren.  Det kan kræve modifikation af
+\texttt{RegAlloc.sig} at få adgang til de relevante dele af
+registerallokatoren.
+
+\subsubsection{Testprogrammer}
+
+Testprogrammer til opgave 4 starter med \texttt{void}, f.eks.\ {\tt
+  void-sort.100} og\newline \texttt{void-error01.100}.  Se endvidere
+afsnit~\ref{eksempelprogrammer}.\newpage
+
+
+\subsection{Opgave 5:  Undtagelser}
+
+Syntaksen af 100 udvides med følgende produktioner:
+
+\[\begin{array}{lcl}
+  Stat &\rightarrow& \texttt{throw}~Exp~\texttt{;} \\
+  Stat &\rightarrow& \texttt{try}~Stats~\texttt{catch}~\textbf{id}~\texttt{:}~Stat \\
+
+\end{array}\]
+
+\noindent
+\texttt{catch} har samme præcedens og associativitet som
+\texttt{else}.
+
+\subsubsection{Semantik}
+
+Der tilføjes undtagelser (\emph{exceptions}) med heltallige værdier.
+Sætningen \texttt{throw~$e$;} beregner $e$ (som skal have typen
+\texttt{int}) til en værdi $n$ og kaster en undtagelse med denne
+værdi.  Denne kan fanges af en \texttt{catch}-sætning, som beskrevet
+herunder.
+
+En sætning af formen
+
+\texttt{try~$ss$~catch~$x$~:~$s$}
+
+\noindent
+udfører sætningerne i $ss$.  Hvis $ss$ bliver færdig uden at kaste
+undtagelser (som ikke fanges allerede i $ss$) sker ikke yderligere.
+Men hvis $ss$ kaster en undtagelse, der ikke fanges i $ss$ selv,
+bindes variablen $x$ til værdien af den kastede undtagelse og $s$
+udføres.  $x$ har typen \texttt{int} og har virkefelt i $s$.
+Bemærk, at undtagelsen kan kastes af en funktion, der er kaldt inde i
+$ss$.
+
+Hvis en undtagelse med værdi $n$ kastes, men ikke fanges af nogen
+\texttt{try-catch}-sætning, skal programmet udskrive meddelelsen
+``\texttt{Uncaught exception: $n$}'' og terminere.
+
+Testen for, om en funktion returnerer med \texttt{return} skal ændres
+til en test, om funktionen returnerer med \texttt{return} eller
+\texttt{throw}, da begge dele er gyldige måder at returnere på.  I den
+forbindelse kan det antages, at kald til andre funktioner kan
+returnere både normalt og med en exception.  Se iøvrigt vinket til
+opgave 1.
+
+\subsubsection{Opgavens art}
+
+Der er overvægt af kodegenerering i forhold til typecheck.  Specielt
+skal mekanismen for at fange undtagelser kastet fra andre funktioner
+overvejes.  Vink: Husk at bruge denne mekanisme også for prædefinerede
+funktioner (\texttt{getint} osv).
+
+\subsubsection{Testprogrammer}
+
+Testprogrammer til opgave 5 starter med \texttt{except}, f.eks.\ {\tt
+  except-find.100} og\newline \texttt{except-error01.100}.  Se endvidere
+afsnit~\ref{eksempelprogrammer}.%\newpage
+
+
+\end{document}
+
+

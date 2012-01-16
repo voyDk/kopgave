@@ -1,0 +1,28 @@
+/* void-swap.100 */
+/* swaps variable contents */
+
+int main()
+{
+  int x,y,*p;
+  x = getint();
+  putint(x);
+  y = getint();
+  p = &x;
+  p* = 13;
+  putint(x);
+  swap (&x,&y);
+  putint(x);
+  putint(y);
+  return 0;
+}
+
+void swap(int *p,*q)
+{
+  int t;
+
+  putint(p*);
+  putint(q*);
+  t = p*;
+  p* = q*;
+  q* = t;
+}

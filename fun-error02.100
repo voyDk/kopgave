@@ -1,0 +1,21 @@
+/* fun-error02.100 */
+
+int main()
+{
+  int x();
+
+  x = g();
+
+  putint(x());
+  return 0;
+}
+
+int g()()
+{
+  return h;
+}
+
+int h()
+{
+  return 42;
+}

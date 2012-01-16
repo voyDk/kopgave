@@ -1,0 +1,9 @@
+/* void-error01.100 */
+/* declaration of void variable */
+
+int main()
+{
+  void x;
+
+  return 0;
+}

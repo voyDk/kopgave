@@ -1,0 +1,11 @@
+/* global error02.100 */
+/* comparison of different reference types */
+
+int **x;
+
+int main()
+{
+  int ***y;
+  putint(x == y);
+  return 0;
+}
