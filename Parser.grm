@@ -2,12 +2,12 @@
 %token <int*(int*int)> NUM
 %token <string*(int*int)> ID STRINGCONST
 %token <char*(int*int)> CHARCONST
-%token <(int*int)> IF ELSE INT CHAR WHILE RETURN
+%token <(int*int)> IF ELSE INT CHAR WHILE RETURN THROW TRY CATCH
 %token <(int*int)> PLUS MINUS LESS EQUAL ASSIGN DEREF
 %token <(int*int)> LPAR RPAR LBRACK RBRACK  LBRACE RBRACE 
-%token <(int*int)> COMMA SEMICOLON EOF
+%token <(int*int)> COMMA SEMICOLON EOF COLON
 
-%right ELSE
+%right ELSE CATCH
 %right ASSIGN
 %left LESS EQUAL
 %left PLUS MINUS
@@ -54,7 +54,7 @@ Dec :	  Type Sids	{ ($1, $2) }
 ;
 
 Sid :	  ID		{ S100.Val $1 }
-	| DEREF ID	{ S100.Ref $2 }
+        | DEREF ID	{ S100.Ref $2 }
 ;
 
 Sids :	  Sid COMMA Sids
@@ -72,6 +72,10 @@ Stat :	  LBRACE Decs1 Stats RBRACE
 			{ S100.While ($3,$5,$1) }
 	| RETURN Exp SEMICOLON
 			{ S100.Return ($2,$1) }
+	| THROW Exp SEMICOLON
+			{ S100.Throw ($2,$1) }
+	| TRY Stats CATCH ID COLON Stat
+			{ S100.Try ($2,S100.Val($4),$6,$1) }
 ;
 
 Stats :	  Stat Stats	{ $1 :: $2 }

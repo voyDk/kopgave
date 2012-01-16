@@ -26,6 +26,9 @@
        | "char"         => Parser.CHAR pos
        | "while"        => Parser.WHILE pos
        | "return"       => Parser.RETURN pos
+       | "throw"        => Parser.THROW pos
+       | "try"          => Parser.TRY pos
+       | "catch"        => Parser.CATCH pos
        | _              => Parser.ID (s, pos)
 
  }
@@ -64,6 +67,7 @@ rule Token = parse
   | `(`                 { Parser.LPAR (getPos lexbuf) }
   | `)`                 { Parser.RPAR (getPos lexbuf) }
   | `,`                 { Parser.COMMA (getPos lexbuf) }
+  | `:`                 { Parser.COLON (getPos lexbuf) }
   | `;`                 { Parser.SEMICOLON (getPos lexbuf) }
   | `*`                 { Parser.DEREF (getPos lexbuf) }
   | `[`                 { Parser.LBRACK (getPos lexbuf) }

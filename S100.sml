@@ -39,6 +39,8 @@ struct
     | While of Exp * Stat * pos
     | Return of Exp * pos
     | Block of Dec list * Stat list * pos
+    | Throw of Exp * pos
+    | Try of Stat list * Sid * Stat * pos
 
   type FunDec = Type * Sid * Dec list * Stat * pos
 
