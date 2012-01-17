@@ -39,7 +39,7 @@ struct
   datatype Location = Reg of string | Mem of string
 
   (* compile expression *)
-  fun compileExp e vtable ftable place =
+  fun compileExp e vtable ftable place handler =
     case e of
       S100.NumConst (n,pos) =>
         if n<32768 then
@@ -70,7 +70,7 @@ struct
 	end
     | S100.LV lval =>
         let
-	  val (code,ty,loc) = compileLval lval vtable ftable
+	  val (code,ty,loc) = compileLval lval vtable ftable handler
 	in
 	  case (ty,loc) of
 	    (Type.Int, Reg x) =>
@@ -96,8 +96,8 @@ struct
     | S100.Assign (lval,e,p) =>
         let
           val t = "_assign_"^newName()
-	  val (code0,ty,loc) = compileLval lval vtable ftable
-	  val (_,code1) = compileExp e vtable ftable t
+	  val (code0,ty,loc) = compileLval lval vtable ftable handler
+	  val (_,code1) = compileExp e vtable ftable t handler
 	in
 	  case (ty,loc) of
 	    (Type.Int, Reg x) =>
@@ -124,8 +124,8 @@ struct
         let
 	  val t1 = "_plus1_"^newName()
 	  val t2 = "_plus2_"^newName()
-          val (ty1,code1) = compileExp e1 vtable ftable t1
-          val (ty2,code2) = compileExp e2 vtable ftable t2
+          val (ty1,code1) = compileExp e1 vtable ftable t1 handler
+          val (ty2,code2) = compileExp e2 vtable ftable t2 handler
 	in
 	  case (ty1,ty2) of
 	    (Type.Ref Type.Int, Type.Int) =>
@@ -148,8 +148,8 @@ struct
         let
 	  val t1 = "_minus1_"^newName()
 	  val t2 = "_minus2_"^newName()
-          val (ty1,code1) = compileExp e1 vtable ftable t1
-          val (ty2,code2) = compileExp e2 vtable ftable t2
+          val (ty1,code1) = compileExp e1 vtable ftable t1 handler
+          val (ty2,code2) = compileExp e2 vtable ftable t2 handler
 	in
 	  case (ty1,ty2) of
 	    (Type.Ref Type.Int, Type.Int) =>
@@ -173,8 +173,8 @@ struct
         let
 	  val t1 = "_less1_"^newName()
 	  val t2 = "_less2_"^newName()
-          val (_,code1) = compileExp e1 vtable ftable t1
-          val (_,code2) = compileExp e2 vtable ftable t2
+          val (_,code1) = compileExp e1 vtable ftable t1 handler
+          val (_,code2) = compileExp e2 vtable ftable t2 handler
 	in
 	  (Type.Int, code1 @ code2 @ [Mips.SLT (place,t1,t2)])
 	end
@@ -184,8 +184,8 @@ struct
 	  val t2 = "_less2_"^newName()
 	  val t3 = "_less2_"^newName()
 	  val t4 = "_less2_"^newName()
-          val (_,code1) = compileExp e1 vtable ftable t1
-          val (_,code2) = compileExp e2 vtable ftable t2
+          val (_,code1) = compileExp e1 vtable ftable t1 handler
+          val (_,code2) = compileExp e2 vtable ftable t2 handler
 	in
 	  (Type.Int,
 	   code1 @ code2 @
@@ -197,7 +197,7 @@ struct
 	  val rTy = case lookup f ftable of
 		      SOME (_,t) => t
 		    | NONE => raise Error ("unknown function "^f,pos)
-	  val (code1,args) = compileExps es vtable ftable
+	  val (code1,args) = compileExps es vtable ftable handler
 	  fun moveArgs [] r = ([],[],0)
 	    | moveArgs (arg::args) r =
 	        let
@@ -220,25 +220,27 @@ struct
 	     [Mips.ADDI (SP,SP,makeConst (~stackSpace))]
 	     @ code1 @ moveCode @
 	     [Mips.JAL (f, parRegs),
+              Mips.BNE ("3", "0", handler),
 	      Mips.MOVE (place,"2"),
 	      Mips.ADDI (SP,SP,makeConst stackSpace)]
 	   else
 	     code1 @ moveCode @
 	     [Mips.JAL (f, parRegs),
+              Mips.BNE ("3", "0", handler),
 	      Mips.MOVE (place,"2")])
 	end
 
-  and compileExps [] vtable ftable = ([], [])
-    | compileExps (e::es) vtable ftable =
+  and compileExps [] vtable ftable handler = ([], [])
+    | compileExps (e::es) vtable ftable handler =
         let
 	  val t1 = "_exps_"^newName()
-          val (_,code1) = compileExp e vtable ftable t1
-	  val (code2, regs) = compileExps es vtable ftable
+          val (_,code1) = compileExp e vtable ftable t1 handler
+	  val (code2, regs) = compileExps es vtable ftable handler
 	in
 	  (code1 @ code2, t1 :: regs)
 	end
 
-  and compileLval lval vtable ftable =
+  and compileLval lval vtable ftable handler =
     case lval of
       S100.Var (x,p) =>
         (case lookup x vtable of
@@ -252,7 +254,7 @@ struct
     | S100.Lookup (x,e,p) =>
         let
 	  val t1 = "_index_"^newName()
-	  val (_,code0) = compileExp e vtable ftable t1
+	  val (_,code0) = compileExp e vtable ftable t1 handler
 	in
           case lookup x vtable of
 	    SOME (Type.Ref Type.Int, y) =>
@@ -274,15 +276,15 @@ struct
 	  | NONE => raise Error ("Unknown variable "^x,p)
 	end
 
-  fun compileStat s vtable ftable exitLabel =
+  fun compileStat s vtable ftable exitLabel handler =
     case s of
-      S100.EX e => #2 (compileExp e vtable ftable "0")
+      S100.EX e => #2 (compileExp e vtable ftable "0" handler)
     | S100.If (e,s1,p) =>
         let
 	  val t = "_if_"^newName()
 	  val l1 = "_endif_"^newName()
-	  val (_,code0) = compileExp e vtable ftable t
-	  val code1 = compileStat s1 vtable ftable exitLabel
+	  val (_,code0) = compileExp e vtable ftable t handler
+	  val code1 = compileStat s1 vtable ftable exitLabel handler
 	in
 	  code0 @ [Mips.BEQ (t,"0",l1)] @ code1 @ [Mips.LABEL l1]
 	end
@@ -291,9 +293,9 @@ struct
 	  val t = "_if_"^newName()
 	  val l1 = "_else_"^newName()
 	  val l2 = "_endif_"^newName()
-	  val (_,code0) = compileExp e vtable ftable t
-	  val code1 = compileStat s1 vtable ftable exitLabel
-	  val code2 = compileStat s2 vtable ftable exitLabel
+	  val (_,code0) = compileExp e vtable ftable t handler
+	  val code1 = compileStat s1 vtable ftable exitLabel handler
+	  val code2 = compileStat s2 vtable ftable exitLabel handler
 	in
 	  code0 @ [Mips.BEQ (t,"0",l1)] @ code1
 	  @ [Mips.J l2, Mips.LABEL l1] @ code2 @ [Mips.LABEL l2]
@@ -303,8 +305,8 @@ struct
 	  val t = "_while_"^newName()
 	  val l1 = "_wentry_"^newName()
 	  val l2 = "_wexit_"^newName()
-	  val (_,code0) = compileExp e vtable ftable t
-	  val code1 = compileStat s1 vtable ftable exitLabel
+	  val (_,code0) = compileExp e vtable ftable t handler
+	  val code1 = compileStat s1 vtable ftable exitLabel handler
 	in
 	  [Mips.LABEL l1] @ code0 @ [Mips.BEQ (t,"0",l2)]
 	  @ code1 @ [Mips.J l1, Mips.LABEL l2]
@@ -312,7 +314,7 @@ struct
     | S100.Return (e,p) =>
         let
 	  val t = "_return_"^newName()
-	  val (_,code0) = compileExp e vtable ftable t
+	  val (_,code0) = compileExp e vtable ftable t handler
 	in
 	  code0 @ [Mips.MOVE ("2",t), Mips.J exitLabel]
 	end
@@ -330,8 +332,32 @@ struct
 	  val vtable1 = extend decs vtable
 	in
 	  List.concat
-	      (List.map (fn s => compileStat s vtable1 ftable exitLabel) stats)
+	      (List.map (fn s => compileStat s vtable1 ftable exitLabel handler) stats)
 	end
+    | S100.Throw (e,p) =>
+      let
+        val (_,code0) = compileExp e vtable ftable "2" handler
+      in
+        code0 @ [Mips.J handler] 
+      end
+    | S100.Try (stats,x,stat,p) =>
+      let
+        val startLabel = "_tryblockStart_"^newName()
+        val endLabel = "_tryblockEnd_"^newName()
+        val handlerLabel = "_handler_"^newName()
+        val vtable1 = (case x of 
+                         S100.Val (s,p) => (s,(Type.Int, "2"))) :: vtable
+        val code1 = compileStat stat vtable1 ftable exitLabel handler
+        val code2 = List.concat
+                    (List.map (fn s => compileStat s vtable ftable exitLabel handlerLabel) stats)
+      in
+        [Mips.J startLabel, 
+         Mips.LABEL handlerLabel]
+        @ code1
+        @ [Mips.LABEL startLabel]
+        @ code2
+        @ [Mips.LABEL endLabel]
+      end
 
   (* code for saving and restoring callee-saves registers *)
   fun stackSave currentReg maxReg savecode restorecode offset =
@@ -355,6 +381,16 @@ struct
         let
 	  val fname = Type.getName sf
 	  val rty = Type.getType typ sf
+          val rtmp = fname^"_return_"^newName()
+          val exit = fname^"_exit_"^newName()
+          val return = fname^"_return_"^newName()
+          val localHandler = fname^"_localHandler_"^newName()
+
+          val returncode = 
+              [Mips.LABEL return,
+               Mips.MOVE ("2", rtmp),
+               Mips.LI ("3", "0")]
+
 	  fun moveArgs [] r = ([], [], 0)
 	    | moveArgs ((t,ss)::ds) r =
 	        moveArgs1 ss (Type.convertType t) ds r
@@ -389,10 +425,10 @@ struct
 	       end
 	  val (parcode,vtable,stackParams) (* move parameters to arguments *)
             = moveArgs args 2
-          val body = compileStat body vtable ftable (fname ^ "_exit")
+          val body = compileStat body vtable ftable exit localHandler
           val (body1, _, maxr,spilled)  (* call register allocator *)
             = RegAlloc.registerAlloc
-                (parcode @ body) [] 2 maxCaller maxReg 0
+                (parcode @ body @ returncode) [] 2 maxCaller maxReg 0
           val (savecode, restorecode, offset) = (* save/restore callee-saves *)
                 stackSave (maxCaller+1) (maxr+1) [] [] (4*spilled)
 		(* save one extra callee-saves register for saving SP *)
@@ -407,12 +443,16 @@ struct
              Mips.SW (RA, SP, makeConst offset)] (* save return address *)
           @ savecode  (* save callee-saves registers *)
           @ body1  (* code for function body *)
-	  @ [Mips.LABEL (fname^"_exit")] (* exit label *)
+	  @ [Mips.LABEL exit] (* exit label *)
 	  @ (if rty=Type.Char then [Mips.ANDI ("2","2","255")] else [])
           @ restorecode  (* restore callee-saves registers *)
           @ [Mips.LW (RA, SP, makeConst offset), (* restore return addr *)
              Mips.ADDI (SP,SP,makeConst (offset+4)), (* move SP up *)
              Mips.JR (RA, [])] (* return *)
+        
+          @ [Mips.LABEL localHandler,
+             Mips.LI ("3", "1"),
+             Mips.J exit]
         end
 
   (* compile program *)
@@ -479,11 +519,30 @@ struct
 	 Mips.ADD(HP,HP,"5"),     (* increase HP by N *)
 	 Mips.JR (RA,[]),
 
+         Mips.LABEL "uncaughtException", (* code for uncaught exceptions *)
+         Mips.MOVE ("27", "2"), (* save exception value *)
+         Mips.LA ("4", "_uncaughtExceptionMsg_"),
+         Mips.LI ("2", "4"),
+         Mips.SYSCALL,          (* print exception message *)
+         Mips.MOVE ("4", "27"),
+         Mips.LI ("2", "1"),   
+         Mips.SYSCALL,          (* print exception value *)
+         Mips.LA ("4", "_cr_"), 
+         Mips.LI ("2", "4"),
+         Mips.SYSCALL,          (* print CR *)
+         Mips.LABEL "_terminate_",
+         Mips.LI ("2", "10"),   (* syscall control = 10 *)
+         Mips.SYSCALL,          (* terminate *)
+
 	 Mips.DATA "",
 	 Mips.ALIGN "2",
 	 Mips.LABEL "_cr_",       (* carriage return string *)
 	 Mips.ASCIIZ "\n",
 	 Mips.ALIGN "2",
+
+         Mips.LABEL "_uncaughtExceptionMsg_",
+         Mips.ASCIIZ "Uncaught exception: ",
+         Mips.ALIGN "2",
 
 	 Mips.LABEL "_heap_",     (* heap space *)
 	 Mips.SPACE "100000"]
