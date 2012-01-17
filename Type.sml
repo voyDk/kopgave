@@ -144,6 +144,17 @@ struct
 	in
 	  List.app (fn s => checkStat s vtable1 ftable resultT) stats
 	end
+    | S100.Throw (e,p) =>
+      if checkExp e vtable ftable = Int
+      then ()
+      else raise Error ("Condition should be integer",p)
+    | S100.Try (stats,x,stat,p) =>
+      let
+        val vtable1 = (extend [x] Int) vtable
+      in
+        (List.app (fn s => checkStat s vtable ftable resultT) stats;
+         checkStat stat vtable1 ftable resultT)
+      end
 
   fun checkReturn s =
     case s of
@@ -153,6 +164,8 @@ struct
     | S100.While (e,s1,p) => false
     | S100.Return (e,p) => true
     | S100.Block (decs,stats,p) => List.exists checkReturn stats
+    | S100.Throw (e,p) => true
+    | S100.Try (stats,x,s,p) => List.exists checkReturn stats
 
   fun checkFunDec (t,sf,decs,body,p) ftable =
         if checkReturn body
