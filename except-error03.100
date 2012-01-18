@@ -1,0 +1,7 @@
+int main() {
+  try
+    throw 42;
+  catch s[0] : putint(s);
+  
+  return 0;
+}
