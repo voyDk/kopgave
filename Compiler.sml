@@ -220,13 +220,13 @@ struct
 	     [Mips.ADDI (SP,SP,makeConst (~stackSpace))]
 	     @ code1 @ moveCode @
 	     [Mips.JAL (f, parRegs),
-              Mips.BNE ("3", "0", handler),
+              Mips.BNE ("26", "0", handler),
 	      Mips.MOVE (place,"2"),
 	      Mips.ADDI (SP,SP,makeConst stackSpace)]
 	   else
 	     code1 @ moveCode @
 	     [Mips.JAL (f, parRegs),
-              Mips.BNE ("3", "0", handler),
+              Mips.BNE ("26", "0", handler),
 	      Mips.MOVE (place,"2")])
 	end
 
@@ -336,7 +336,7 @@ struct
 	end
     | S100.Throw (e,p) =>
       let
-        val (_,code0) = compileExp e vtable ftable "26" handler
+        val (_,code0) = compileExp e vtable ftable "2" handler
       in
         code0 @ [Mips.J handler] 
       end
@@ -346,14 +346,14 @@ struct
         val endLabel = "_tryblockEnd_"^newName()
         val handlerLabel = "_handler_"^newName()
         val vtable1 = (case x of 
-                         S100.Val (s,p) => (s,(Type.Int, "26"))) :: vtable
+                         S100.Val (s,p) => (s,(Type.Int, "2"))) :: vtable
         val code1 = compileStat stat vtable1 ftable exitLabel handler
         val code2 = List.concat
                     (List.map (fn s => compileStat s vtable ftable exitLabel handlerLabel) stats)
       in
         [Mips.J startLabel, 
          Mips.LABEL handlerLabel]
-        @ [Mips.LI ("3", "0")] (* reset exception flag for function calls *)
+        @ [Mips.LI ("26", "0")] (* reset exception flag for function calls *)
         @ code1
         @ [Mips.J endLabel]
         @ [Mips.LABEL startLabel]
@@ -391,7 +391,7 @@ struct
           val returncode = 
               [Mips.LABEL return,
                Mips.MOVE ("2", rtmp),
-               Mips.LI ("3", "0")]
+               Mips.LI ("26", "0")]
 
 	  fun moveArgs [] r = ([], [], 0)
 	    | moveArgs ((t,ss)::ds) r =
@@ -453,7 +453,7 @@ struct
              Mips.JR (RA, [])] (* return *)
         
           @ [Mips.LABEL localHandler,
-             Mips.LI ("3", "1"),
+             Mips.LI ("26", "1"),
              Mips.J exit]
         end
 
@@ -474,7 +474,7 @@ struct
        Mips.GLOBL "main",
        Mips.LA (HP, "_heap_")]    (* initialise heap pointer *)
       @ [Mips.JAL ("main",[]),    (* run program *)
-         Mips.BNE ("3","0","uncaughtException"),
+         Mips.BNE ("26","0","uncaughtException"),
          Mips.J "_terminate_"]
       @ funsCode		  (* code for functions *)
 
