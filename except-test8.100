@@ -1,0 +1,17 @@
+/* except-test8.100 */
+/* output 1337 */
+
+int main() {
+  foo();
+  bar();
+
+  return 0;
+}
+
+int foo() {
+  throw 1337;
+}
+
+int bar() {
+  throw 42;
+}
