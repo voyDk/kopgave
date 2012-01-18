@@ -12,11 +12,11 @@ int main() {
 int foo() {
   try
     bar();
-  catch x : throw 42;
+  catch x : throw 1337;
 
   return 0;
 }
 
 int bar() {
-  throw 1337;
+  throw 42;
 }

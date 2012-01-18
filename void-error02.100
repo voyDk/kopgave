@@ -1,7 +1,0 @@
-/* void-error02.100 */
-/* non-void function returns no value */
-
-int main()
-{
-  return;
-}

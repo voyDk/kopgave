@@ -28,33 +28,35 @@
   18       | IF LPAR Exp RPAR Stat ELSE Stat
   19       | WHILE LPAR Exp RPAR Stat
   20       | RETURN Exp SEMICOLON
+  21       | THROW Exp SEMICOLON
+  22       | TRY Stats CATCH ID COLON Stat
 
-  21  Stats : Stat Stats
-  22        |
+  23  Stats : Stat Stats
+  24        |
 
-  23  Exp : NUM
-  24      | CHARCONST
-  25      | STRINGCONST
-  26      | Lval
-  27      | Lval ASSIGN Exp
-  28      | Exp PLUS Exp
-  29      | Exp MINUS Exp
-  30      | Exp LESS Exp
-  31      | Exp EQUAL Exp
-  32      | ID LPAR Exps RPAR
-  33      | LPAR Exp RPAR
+  25  Exp : NUM
+  26      | CHARCONST
+  27      | STRINGCONST
+  28      | Lval
+  29      | Lval ASSIGN Exp
+  30      | Exp PLUS Exp
+  31      | Exp MINUS Exp
+  32      | Exp LESS Exp
+  33      | Exp EQUAL Exp
+  34      | ID LPAR Exps RPAR
+  35      | LPAR Exp RPAR
 
-  34  Exps :
-  35       | Exps1
+  36  Exps :
+  37       | Exps1
 
-  36  Exps1 : Exp
-  37        | Exp COMMA Exps
+  38  Exps1 : Exp
+  39        | Exp COMMA Exps
 
-  38  Lval : ID
-  39       | ID DEREF
-  40       | ID LBRACK Exp RBRACK
+  40  Lval : ID
+  41       | ID DEREF
+  42       | ID LBRACK Exp RBRACK
 
-  41  %entry% : '\001' Prog
+  43  %entry% : '\001' Prog
 
 state 0
 	$accept : . %entry% $end  (0)
@@ -66,7 +68,7 @@ state 0
 
 
 state 1
-	%entry% : '\001' . Prog  (41)
+	%entry% : '\001' . Prog  (43)
 	FunDecs : .  (3)
 
 	CHAR  shift 3
@@ -97,9 +99,9 @@ state 4
 
 
 state 5
-	%entry% : '\001' Prog .  (41)
+	%entry% : '\001' Prog .  (43)
 
-	.  reduce 41
+	.  reduce 43
 
 
 state 6
@@ -194,12 +196,14 @@ state 16
 	NUM  shift 24
 	RETURN  shift 25
 	STRINGCONST  shift 26
-	WHILE  shift 27
+	THROW  shift 27
+	TRY  shift 28
+	WHILE  shift 29
 	.  error
 
-	Exp  goto 28
-	Lval  goto 29
-	Stat  goto 30
+	Exp  goto 30
+	Lval  goto 31
+	Stat  goto 32
 
 
 state 17
@@ -209,49 +213,49 @@ state 17
 	ID  shift 10
 	.  error
 
-	Sid  goto 31
-	Sids  goto 32
+	Sid  goto 33
+	Sids  goto 34
 
 
 state 18
 	Decs : Decs1 Dec .  (6)
 	Decs1 : Decs1 Dec . SEMICOLON  (8)
 
-	SEMICOLON  shift 33
+	SEMICOLON  shift 35
 	RPAR  reduce 6
 
 
 state 19
-	Exp : CHARCONST .  (24)
+	Exp : CHARCONST .  (26)
 
-	.  reduce 24
+	.  reduce 26
 
 
 state 20
-	Exp : ID . LPAR Exps RPAR  (32)
-	Lval : ID .  (38)
-	Lval : ID . DEREF  (39)
-	Lval : ID . LBRACK Exp RBRACK  (40)
+	Exp : ID . LPAR Exps RPAR  (34)
+	Lval : ID .  (40)
+	Lval : ID . DEREF  (41)
+	Lval : ID . LBRACK Exp RBRACK  (42)
 
-	DEREF  shift 34
-	LBRACK  shift 35
-	LPAR  shift 36
-	ASSIGN  reduce 38
-	COMMA  reduce 38
-	EQUAL  reduce 38
-	LESS  reduce 38
-	MINUS  reduce 38
-	PLUS  reduce 38
-	RBRACK  reduce 38
-	RPAR  reduce 38
-	SEMICOLON  reduce 38
+	DEREF  shift 36
+	LBRACK  shift 37
+	LPAR  shift 38
+	ASSIGN  reduce 40
+	COMMA  reduce 40
+	EQUAL  reduce 40
+	LESS  reduce 40
+	MINUS  reduce 40
+	PLUS  reduce 40
+	RBRACK  reduce 40
+	RPAR  reduce 40
+	SEMICOLON  reduce 40
 
 
 state 21
 	Stat : IF . LPAR Exp RPAR Stat  (17)
 	Stat : IF . LPAR Exp RPAR Stat ELSE Stat  (18)
 
-	LPAR  shift 37
+	LPAR  shift 39
 	.  error
 
 
@@ -261,11 +265,11 @@ state 22
 
 	.  reduce 9
 
-	Decs1  goto 38
+	Decs1  goto 40
 
 
 state 23
-	Exp : LPAR . Exp RPAR  (33)
+	Exp : LPAR . Exp RPAR  (35)
 
 	CHARCONST  shift 19
 	ID  shift 20
@@ -274,14 +278,14 @@ state 23
 	STRINGCONST  shift 26
 	.  error
 
-	Exp  goto 39
-	Lval  goto 29
+	Exp  goto 41
+	Lval  goto 31
 
 
 state 24
-	Exp : NUM .  (23)
+	Exp : NUM .  (25)
 
-	.  reduce 23
+	.  reduce 25
 
 
 state 25
@@ -294,481 +298,80 @@ state 25
 	STRINGCONST  shift 26
 	.  error
 
-	Exp  goto 40
-	Lval  goto 29
+	Exp  goto 42
+	Lval  goto 31
 
 
 state 26
-	Exp : STRINGCONST .  (25)
+	Exp : STRINGCONST .  (27)
 
-	.  reduce 25
+	.  reduce 27
 
 
 state 27
-	Stat : WHILE . LPAR Exp RPAR Stat  (19)
+	Stat : THROW . Exp SEMICOLON  (21)
 
-	LPAR  shift 41
+	CHARCONST  shift 19
+	ID  shift 20
+	LPAR  shift 23
+	NUM  shift 24
+	STRINGCONST  shift 26
 	.  error
+
+	Exp  goto 43
+	Lval  goto 31
 
 
 state 28
-	Stat : Exp . SEMICOLON  (16)
-	Exp : Exp . PLUS Exp  (28)
-	Exp : Exp . MINUS Exp  (29)
-	Exp : Exp . LESS Exp  (30)
-	Exp : Exp . EQUAL Exp  (31)
+	Stat : TRY . Stats CATCH ID COLON Stat  (22)
+	Stats : .  (24)
 
-	EQUAL  shift 42
-	LESS  shift 43
-	MINUS  shift 44
-	PLUS  shift 45
-	SEMICOLON  shift 46
-	.  error
+	CHARCONST  shift 19
+	ID  shift 20
+	IF  shift 21
+	LBRACE  shift 22
+	LPAR  shift 23
+	NUM  shift 24
+	RETURN  shift 25
+	STRINGCONST  shift 26
+	THROW  shift 27
+	TRY  shift 28
+	WHILE  shift 29
+	CATCH  reduce 24
+
+	Exp  goto 30
+	Lval  goto 31
+	Stat  goto 44
+	Stats  goto 45
 
 
 state 29
-	Exp : Lval .  (26)
-	Exp : Lval . ASSIGN Exp  (27)
+	Stat : WHILE . LPAR Exp RPAR Stat  (19)
 
-	ASSIGN  shift 47
-	COMMA  reduce 26
-	EQUAL  reduce 26
-	LESS  reduce 26
-	MINUS  reduce 26
-	PLUS  reduce 26
-	RBRACK  reduce 26
-	RPAR  reduce 26
-	SEMICOLON  reduce 26
+	LPAR  shift 46
+	.  error
 
 
 state 30
-	FunDecs : Type Sid LPAR Decs RPAR Stat . FunDecs  (2)
-	FunDecs : .  (3)
+	Stat : Exp . SEMICOLON  (16)
+	Exp : Exp . PLUS Exp  (30)
+	Exp : Exp . MINUS Exp  (31)
+	Exp : Exp . LESS Exp  (32)
+	Exp : Exp . EQUAL Exp  (33)
 
-	CHAR  shift 3
-	INT  shift 4
-	EOF  reduce 3
-
-	FunDecs  goto 48
-	Type  goto 7
+	EQUAL  shift 47
+	LESS  shift 48
+	MINUS  shift 49
+	PLUS  shift 50
+	SEMICOLON  shift 51
+	.  error
 
 
 state 31
-	Sids : Sid . COMMA Sids  (13)
-	Sids : Sid .  (14)
+	Exp : Lval .  (28)
+	Exp : Lval . ASSIGN Exp  (29)
 
-	COMMA  shift 49
-	RPAR  reduce 14
-	SEMICOLON  reduce 14
-
-
-state 32
-	Dec : Type Sids .  (10)
-
-	.  reduce 10
-
-
-state 33
-	Decs1 : Decs1 Dec SEMICOLON .  (8)
-
-	.  reduce 8
-
-
-state 34
-	Lval : ID DEREF .  (39)
-
-	.  reduce 39
-
-
-state 35
-	Lval : ID LBRACK . Exp RBRACK  (40)
-
-	CHARCONST  shift 19
-	ID  shift 20
-	LPAR  shift 23
-	NUM  shift 24
-	STRINGCONST  shift 26
-	.  error
-
-	Exp  goto 50
-	Lval  goto 29
-
-
-state 36
-	Exp : ID LPAR . Exps RPAR  (32)
-	Exps : .  (34)
-
-	CHARCONST  shift 19
-	ID  shift 20
-	LPAR  shift 23
-	NUM  shift 24
-	STRINGCONST  shift 26
-	RPAR  reduce 34
-
-	Exp  goto 51
-	Exps  goto 52
-	Exps1  goto 53
-	Lval  goto 29
-
-
-state 37
-	Stat : IF LPAR . Exp RPAR Stat  (17)
-	Stat : IF LPAR . Exp RPAR Stat ELSE Stat  (18)
-
-	CHARCONST  shift 19
-	ID  shift 20
-	LPAR  shift 23
-	NUM  shift 24
-	STRINGCONST  shift 26
-	.  error
-
-	Exp  goto 54
-	Lval  goto 29
-
-
-state 38
-	Decs1 : Decs1 . Dec SEMICOLON  (8)
-	Stat : LBRACE Decs1 . Stats RBRACE  (15)
-	Stats : .  (22)
-
-	CHAR  shift 3
-	CHARCONST  shift 19
-	ID  shift 20
-	IF  shift 21
-	INT  shift 4
-	LBRACE  shift 22
-	LPAR  shift 23
-	NUM  shift 24
-	RETURN  shift 25
-	STRINGCONST  shift 26
-	WHILE  shift 27
-	RBRACE  reduce 22
-
-	Type  goto 17
-	Dec  goto 55
-	Exp  goto 28
-	Lval  goto 29
-	Stat  goto 56
-	Stats  goto 57
-
-
-state 39
-	Exp : Exp . PLUS Exp  (28)
-	Exp : Exp . MINUS Exp  (29)
-	Exp : Exp . LESS Exp  (30)
-	Exp : Exp . EQUAL Exp  (31)
-	Exp : LPAR Exp . RPAR  (33)
-
-	EQUAL  shift 42
-	LESS  shift 43
-	MINUS  shift 44
-	PLUS  shift 45
-	RPAR  shift 58
-	.  error
-
-
-state 40
-	Stat : RETURN Exp . SEMICOLON  (20)
-	Exp : Exp . PLUS Exp  (28)
-	Exp : Exp . MINUS Exp  (29)
-	Exp : Exp . LESS Exp  (30)
-	Exp : Exp . EQUAL Exp  (31)
-
-	EQUAL  shift 42
-	LESS  shift 43
-	MINUS  shift 44
-	PLUS  shift 45
-	SEMICOLON  shift 59
-	.  error
-
-
-state 41
-	Stat : WHILE LPAR . Exp RPAR Stat  (19)
-
-	CHARCONST  shift 19
-	ID  shift 20
-	LPAR  shift 23
-	NUM  shift 24
-	STRINGCONST  shift 26
-	.  error
-
-	Exp  goto 60
-	Lval  goto 29
-
-
-state 42
-	Exp : Exp EQUAL . Exp  (31)
-
-	CHARCONST  shift 19
-	ID  shift 20
-	LPAR  shift 23
-	NUM  shift 24
-	STRINGCONST  shift 26
-	.  error
-
-	Exp  goto 61
-	Lval  goto 29
-
-
-state 43
-	Exp : Exp LESS . Exp  (30)
-
-	CHARCONST  shift 19
-	ID  shift 20
-	LPAR  shift 23
-	NUM  shift 24
-	STRINGCONST  shift 26
-	.  error
-
-	Exp  goto 62
-	Lval  goto 29
-
-
-state 44
-	Exp : Exp MINUS . Exp  (29)
-
-	CHARCONST  shift 19
-	ID  shift 20
-	LPAR  shift 23
-	NUM  shift 24
-	STRINGCONST  shift 26
-	.  error
-
-	Exp  goto 63
-	Lval  goto 29
-
-
-state 45
-	Exp : Exp PLUS . Exp  (28)
-
-	CHARCONST  shift 19
-	ID  shift 20
-	LPAR  shift 23
-	NUM  shift 24
-	STRINGCONST  shift 26
-	.  error
-
-	Exp  goto 64
-	Lval  goto 29
-
-
-state 46
-	Stat : Exp SEMICOLON .  (16)
-
-	.  reduce 16
-
-
-state 47
-	Exp : Lval ASSIGN . Exp  (27)
-
-	CHARCONST  shift 19
-	ID  shift 20
-	LPAR  shift 23
-	NUM  shift 24
-	STRINGCONST  shift 26
-	.  error
-
-	Exp  goto 65
-	Lval  goto 29
-
-
-state 48
-	FunDecs : Type Sid LPAR Decs RPAR Stat FunDecs .  (2)
-
-	.  reduce 2
-
-
-state 49
-	Sids : Sid COMMA . Sids  (13)
-
-	DEREF  shift 9
-	ID  shift 10
-	.  error
-
-	Sid  goto 31
-	Sids  goto 66
-
-
-state 50
-	Exp : Exp . PLUS Exp  (28)
-	Exp : Exp . MINUS Exp  (29)
-	Exp : Exp . LESS Exp  (30)
-	Exp : Exp . EQUAL Exp  (31)
-	Lval : ID LBRACK Exp . RBRACK  (40)
-
-	EQUAL  shift 42
-	LESS  shift 43
-	MINUS  shift 44
-	PLUS  shift 45
-	RBRACK  shift 67
-	.  error
-
-
-state 51
-	Exp : Exp . PLUS Exp  (28)
-	Exp : Exp . MINUS Exp  (29)
-	Exp : Exp . LESS Exp  (30)
-	Exp : Exp . EQUAL Exp  (31)
-	Exps1 : Exp .  (36)
-	Exps1 : Exp . COMMA Exps  (37)
-
-	COMMA  shift 68
-	EQUAL  shift 42
-	LESS  shift 43
-	MINUS  shift 44
-	PLUS  shift 45
-	RPAR  reduce 36
-
-
-state 52
-	Exp : ID LPAR Exps . RPAR  (32)
-
-	RPAR  shift 69
-	.  error
-
-
-state 53
-	Exps : Exps1 .  (35)
-
-	.  reduce 35
-
-
-state 54
-	Stat : IF LPAR Exp . RPAR Stat  (17)
-	Stat : IF LPAR Exp . RPAR Stat ELSE Stat  (18)
-	Exp : Exp . PLUS Exp  (28)
-	Exp : Exp . MINUS Exp  (29)
-	Exp : Exp . LESS Exp  (30)
-	Exp : Exp . EQUAL Exp  (31)
-
-	EQUAL  shift 42
-	LESS  shift 43
-	MINUS  shift 44
-	PLUS  shift 45
-	RPAR  shift 70
-	.  error
-
-
-state 55
-	Decs1 : Decs1 Dec . SEMICOLON  (8)
-
-	SEMICOLON  shift 33
-	.  error
-
-
-state 56
-	Stats : Stat . Stats  (21)
-	Stats : .  (22)
-
-	CHARCONST  shift 19
-	ID  shift 20
-	IF  shift 21
-	LBRACE  shift 22
-	LPAR  shift 23
-	NUM  shift 24
-	RETURN  shift 25
-	STRINGCONST  shift 26
-	WHILE  shift 27
-	RBRACE  reduce 22
-
-	Exp  goto 28
-	Lval  goto 29
-	Stat  goto 56
-	Stats  goto 71
-
-
-state 57
-	Stat : LBRACE Decs1 Stats . RBRACE  (15)
-
-	RBRACE  shift 72
-	.  error
-
-
-state 58
-	Exp : LPAR Exp RPAR .  (33)
-
-	.  reduce 33
-
-
-state 59
-	Stat : RETURN Exp SEMICOLON .  (20)
-
-	.  reduce 20
-
-
-state 60
-	Stat : WHILE LPAR Exp . RPAR Stat  (19)
-	Exp : Exp . PLUS Exp  (28)
-	Exp : Exp . MINUS Exp  (29)
-	Exp : Exp . LESS Exp  (30)
-	Exp : Exp . EQUAL Exp  (31)
-
-	EQUAL  shift 42
-	LESS  shift 43
-	MINUS  shift 44
-	PLUS  shift 45
-	RPAR  shift 73
-	.  error
-
-
-state 61
-	Exp : Exp . PLUS Exp  (28)
-	Exp : Exp . MINUS Exp  (29)
-	Exp : Exp . LESS Exp  (30)
-	Exp : Exp . EQUAL Exp  (31)
-	Exp : Exp EQUAL Exp .  (31)
-
-	MINUS  shift 44
-	PLUS  shift 45
-	COMMA  reduce 31
-	EQUAL  reduce 31
-	LESS  reduce 31
-	RBRACK  reduce 31
-	RPAR  reduce 31
-	SEMICOLON  reduce 31
-
-
-state 62
-	Exp : Exp . PLUS Exp  (28)
-	Exp : Exp . MINUS Exp  (29)
-	Exp : Exp . LESS Exp  (30)
-	Exp : Exp LESS Exp .  (30)
-	Exp : Exp . EQUAL Exp  (31)
-
-	MINUS  shift 44
-	PLUS  shift 45
-	COMMA  reduce 30
-	EQUAL  reduce 30
-	LESS  reduce 30
-	RBRACK  reduce 30
-	RPAR  reduce 30
-	SEMICOLON  reduce 30
-
-
-state 63
-	Exp : Exp . PLUS Exp  (28)
-	Exp : Exp . MINUS Exp  (29)
-	Exp : Exp MINUS Exp .  (29)
-	Exp : Exp . LESS Exp  (30)
-	Exp : Exp . EQUAL Exp  (31)
-
-	COMMA  reduce 29
-	EQUAL  reduce 29
-	LESS  reduce 29
-	MINUS  reduce 29
-	PLUS  reduce 29
-	RBRACK  reduce 29
-	RPAR  reduce 29
-	SEMICOLON  reduce 29
-
-
-state 64
-	Exp : Exp . PLUS Exp  (28)
-	Exp : Exp PLUS Exp .  (28)
-	Exp : Exp . MINUS Exp  (29)
-	Exp : Exp . LESS Exp  (30)
-	Exp : Exp . EQUAL Exp  (31)
-
+	ASSIGN  shift 52
 	COMMA  reduce 28
 	EQUAL  reduce 28
 	LESS  reduce 28
@@ -779,59 +382,543 @@ state 64
 	SEMICOLON  reduce 28
 
 
-state 65
-	Exp : Lval ASSIGN Exp .  (27)
-	Exp : Exp . PLUS Exp  (28)
-	Exp : Exp . MINUS Exp  (29)
-	Exp : Exp . LESS Exp  (30)
-	Exp : Exp . EQUAL Exp  (31)
+state 32
+	FunDecs : Type Sid LPAR Decs RPAR Stat . FunDecs  (2)
+	FunDecs : .  (3)
 
-	EQUAL  shift 42
-	LESS  shift 43
-	MINUS  shift 44
-	PLUS  shift 45
-	COMMA  reduce 27
-	RBRACK  reduce 27
-	RPAR  reduce 27
-	SEMICOLON  reduce 27
+	CHAR  shift 3
+	INT  shift 4
+	EOF  reduce 3
+
+	FunDecs  goto 53
+	Type  goto 7
 
 
-state 66
-	Sids : Sid COMMA Sids .  (13)
+state 33
+	Sids : Sid . COMMA Sids  (13)
+	Sids : Sid .  (14)
 
-	.  reduce 13
-
-
-state 67
-	Lval : ID LBRACK Exp RBRACK .  (40)
-
-	.  reduce 40
+	COMMA  shift 54
+	RPAR  reduce 14
+	SEMICOLON  reduce 14
 
 
-state 68
-	Exps1 : Exp COMMA . Exps  (37)
-	Exps : .  (34)
+state 34
+	Dec : Type Sids .  (10)
+
+	.  reduce 10
+
+
+state 35
+	Decs1 : Decs1 Dec SEMICOLON .  (8)
+
+	.  reduce 8
+
+
+state 36
+	Lval : ID DEREF .  (41)
+
+	.  reduce 41
+
+
+state 37
+	Lval : ID LBRACK . Exp RBRACK  (42)
 
 	CHARCONST  shift 19
 	ID  shift 20
 	LPAR  shift 23
 	NUM  shift 24
 	STRINGCONST  shift 26
-	RPAR  reduce 34
+	.  error
 
-	Exp  goto 51
-	Exps  goto 74
-	Exps1  goto 53
-	Lval  goto 29
+	Exp  goto 55
+	Lval  goto 31
+
+
+state 38
+	Exp : ID LPAR . Exps RPAR  (34)
+	Exps : .  (36)
+
+	CHARCONST  shift 19
+	ID  shift 20
+	LPAR  shift 23
+	NUM  shift 24
+	STRINGCONST  shift 26
+	RPAR  reduce 36
+
+	Exp  goto 56
+	Exps  goto 57
+	Exps1  goto 58
+	Lval  goto 31
+
+
+state 39
+	Stat : IF LPAR . Exp RPAR Stat  (17)
+	Stat : IF LPAR . Exp RPAR Stat ELSE Stat  (18)
+
+	CHARCONST  shift 19
+	ID  shift 20
+	LPAR  shift 23
+	NUM  shift 24
+	STRINGCONST  shift 26
+	.  error
+
+	Exp  goto 59
+	Lval  goto 31
+
+
+state 40
+	Decs1 : Decs1 . Dec SEMICOLON  (8)
+	Stat : LBRACE Decs1 . Stats RBRACE  (15)
+	Stats : .  (24)
+
+	CHAR  shift 3
+	CHARCONST  shift 19
+	ID  shift 20
+	IF  shift 21
+	INT  shift 4
+	LBRACE  shift 22
+	LPAR  shift 23
+	NUM  shift 24
+	RETURN  shift 25
+	STRINGCONST  shift 26
+	THROW  shift 27
+	TRY  shift 28
+	WHILE  shift 29
+	RBRACE  reduce 24
+
+	Type  goto 17
+	Dec  goto 60
+	Exp  goto 30
+	Lval  goto 31
+	Stat  goto 44
+	Stats  goto 61
+
+
+state 41
+	Exp : Exp . PLUS Exp  (30)
+	Exp : Exp . MINUS Exp  (31)
+	Exp : Exp . LESS Exp  (32)
+	Exp : Exp . EQUAL Exp  (33)
+	Exp : LPAR Exp . RPAR  (35)
+
+	EQUAL  shift 47
+	LESS  shift 48
+	MINUS  shift 49
+	PLUS  shift 50
+	RPAR  shift 62
+	.  error
+
+
+state 42
+	Stat : RETURN Exp . SEMICOLON  (20)
+	Exp : Exp . PLUS Exp  (30)
+	Exp : Exp . MINUS Exp  (31)
+	Exp : Exp . LESS Exp  (32)
+	Exp : Exp . EQUAL Exp  (33)
+
+	EQUAL  shift 47
+	LESS  shift 48
+	MINUS  shift 49
+	PLUS  shift 50
+	SEMICOLON  shift 63
+	.  error
+
+
+state 43
+	Stat : THROW Exp . SEMICOLON  (21)
+	Exp : Exp . PLUS Exp  (30)
+	Exp : Exp . MINUS Exp  (31)
+	Exp : Exp . LESS Exp  (32)
+	Exp : Exp . EQUAL Exp  (33)
+
+	EQUAL  shift 47
+	LESS  shift 48
+	MINUS  shift 49
+	PLUS  shift 50
+	SEMICOLON  shift 64
+	.  error
+
+
+state 44
+	Stats : Stat . Stats  (23)
+	Stats : .  (24)
+
+	CHARCONST  shift 19
+	ID  shift 20
+	IF  shift 21
+	LBRACE  shift 22
+	LPAR  shift 23
+	NUM  shift 24
+	RETURN  shift 25
+	STRINGCONST  shift 26
+	THROW  shift 27
+	TRY  shift 28
+	WHILE  shift 29
+	CATCH  reduce 24
+	RBRACE  reduce 24
+
+	Exp  goto 30
+	Lval  goto 31
+	Stat  goto 44
+	Stats  goto 65
+
+
+state 45
+	Stat : TRY Stats . CATCH ID COLON Stat  (22)
+
+	CATCH  shift 66
+	.  error
+
+
+state 46
+	Stat : WHILE LPAR . Exp RPAR Stat  (19)
+
+	CHARCONST  shift 19
+	ID  shift 20
+	LPAR  shift 23
+	NUM  shift 24
+	STRINGCONST  shift 26
+	.  error
+
+	Exp  goto 67
+	Lval  goto 31
+
+
+state 47
+	Exp : Exp EQUAL . Exp  (33)
+
+	CHARCONST  shift 19
+	ID  shift 20
+	LPAR  shift 23
+	NUM  shift 24
+	STRINGCONST  shift 26
+	.  error
+
+	Exp  goto 68
+	Lval  goto 31
+
+
+state 48
+	Exp : Exp LESS . Exp  (32)
+
+	CHARCONST  shift 19
+	ID  shift 20
+	LPAR  shift 23
+	NUM  shift 24
+	STRINGCONST  shift 26
+	.  error
+
+	Exp  goto 69
+	Lval  goto 31
+
+
+state 49
+	Exp : Exp MINUS . Exp  (31)
+
+	CHARCONST  shift 19
+	ID  shift 20
+	LPAR  shift 23
+	NUM  shift 24
+	STRINGCONST  shift 26
+	.  error
+
+	Exp  goto 70
+	Lval  goto 31
+
+
+state 50
+	Exp : Exp PLUS . Exp  (30)
+
+	CHARCONST  shift 19
+	ID  shift 20
+	LPAR  shift 23
+	NUM  shift 24
+	STRINGCONST  shift 26
+	.  error
+
+	Exp  goto 71
+	Lval  goto 31
+
+
+state 51
+	Stat : Exp SEMICOLON .  (16)
+
+	.  reduce 16
+
+
+state 52
+	Exp : Lval ASSIGN . Exp  (29)
+
+	CHARCONST  shift 19
+	ID  shift 20
+	LPAR  shift 23
+	NUM  shift 24
+	STRINGCONST  shift 26
+	.  error
+
+	Exp  goto 72
+	Lval  goto 31
+
+
+state 53
+	FunDecs : Type Sid LPAR Decs RPAR Stat FunDecs .  (2)
+
+	.  reduce 2
+
+
+state 54
+	Sids : Sid COMMA . Sids  (13)
+
+	DEREF  shift 9
+	ID  shift 10
+	.  error
+
+	Sid  goto 33
+	Sids  goto 73
+
+
+state 55
+	Exp : Exp . PLUS Exp  (30)
+	Exp : Exp . MINUS Exp  (31)
+	Exp : Exp . LESS Exp  (32)
+	Exp : Exp . EQUAL Exp  (33)
+	Lval : ID LBRACK Exp . RBRACK  (42)
+
+	EQUAL  shift 47
+	LESS  shift 48
+	MINUS  shift 49
+	PLUS  shift 50
+	RBRACK  shift 74
+	.  error
+
+
+state 56
+	Exp : Exp . PLUS Exp  (30)
+	Exp : Exp . MINUS Exp  (31)
+	Exp : Exp . LESS Exp  (32)
+	Exp : Exp . EQUAL Exp  (33)
+	Exps1 : Exp .  (38)
+	Exps1 : Exp . COMMA Exps  (39)
+
+	COMMA  shift 75
+	EQUAL  shift 47
+	LESS  shift 48
+	MINUS  shift 49
+	PLUS  shift 50
+	RPAR  reduce 38
+
+
+state 57
+	Exp : ID LPAR Exps . RPAR  (34)
+
+	RPAR  shift 76
+	.  error
+
+
+state 58
+	Exps : Exps1 .  (37)
+
+	.  reduce 37
+
+
+state 59
+	Stat : IF LPAR Exp . RPAR Stat  (17)
+	Stat : IF LPAR Exp . RPAR Stat ELSE Stat  (18)
+	Exp : Exp . PLUS Exp  (30)
+	Exp : Exp . MINUS Exp  (31)
+	Exp : Exp . LESS Exp  (32)
+	Exp : Exp . EQUAL Exp  (33)
+
+	EQUAL  shift 47
+	LESS  shift 48
+	MINUS  shift 49
+	PLUS  shift 50
+	RPAR  shift 77
+	.  error
+
+
+state 60
+	Decs1 : Decs1 Dec . SEMICOLON  (8)
+
+	SEMICOLON  shift 35
+	.  error
+
+
+state 61
+	Stat : LBRACE Decs1 Stats . RBRACE  (15)
+
+	RBRACE  shift 78
+	.  error
+
+
+state 62
+	Exp : LPAR Exp RPAR .  (35)
+
+	.  reduce 35
+
+
+state 63
+	Stat : RETURN Exp SEMICOLON .  (20)
+
+	.  reduce 20
+
+
+state 64
+	Stat : THROW Exp SEMICOLON .  (21)
+
+	.  reduce 21
+
+
+state 65
+	Stats : Stat Stats .  (23)
+
+	.  reduce 23
+
+
+state 66
+	Stat : TRY Stats CATCH . ID COLON Stat  (22)
+
+	ID  shift 79
+	.  error
+
+
+state 67
+	Stat : WHILE LPAR Exp . RPAR Stat  (19)
+	Exp : Exp . PLUS Exp  (30)
+	Exp : Exp . MINUS Exp  (31)
+	Exp : Exp . LESS Exp  (32)
+	Exp : Exp . EQUAL Exp  (33)
+
+	EQUAL  shift 47
+	LESS  shift 48
+	MINUS  shift 49
+	PLUS  shift 50
+	RPAR  shift 80
+	.  error
+
+
+state 68
+	Exp : Exp . PLUS Exp  (30)
+	Exp : Exp . MINUS Exp  (31)
+	Exp : Exp . LESS Exp  (32)
+	Exp : Exp . EQUAL Exp  (33)
+	Exp : Exp EQUAL Exp .  (33)
+
+	MINUS  shift 49
+	PLUS  shift 50
+	COMMA  reduce 33
+	EQUAL  reduce 33
+	LESS  reduce 33
+	RBRACK  reduce 33
+	RPAR  reduce 33
+	SEMICOLON  reduce 33
 
 
 state 69
-	Exp : ID LPAR Exps RPAR .  (32)
+	Exp : Exp . PLUS Exp  (30)
+	Exp : Exp . MINUS Exp  (31)
+	Exp : Exp . LESS Exp  (32)
+	Exp : Exp LESS Exp .  (32)
+	Exp : Exp . EQUAL Exp  (33)
 
-	.  reduce 32
+	MINUS  shift 49
+	PLUS  shift 50
+	COMMA  reduce 32
+	EQUAL  reduce 32
+	LESS  reduce 32
+	RBRACK  reduce 32
+	RPAR  reduce 32
+	SEMICOLON  reduce 32
 
 
 state 70
+	Exp : Exp . PLUS Exp  (30)
+	Exp : Exp . MINUS Exp  (31)
+	Exp : Exp MINUS Exp .  (31)
+	Exp : Exp . LESS Exp  (32)
+	Exp : Exp . EQUAL Exp  (33)
+
+	COMMA  reduce 31
+	EQUAL  reduce 31
+	LESS  reduce 31
+	MINUS  reduce 31
+	PLUS  reduce 31
+	RBRACK  reduce 31
+	RPAR  reduce 31
+	SEMICOLON  reduce 31
+
+
+state 71
+	Exp : Exp . PLUS Exp  (30)
+	Exp : Exp PLUS Exp .  (30)
+	Exp : Exp . MINUS Exp  (31)
+	Exp : Exp . LESS Exp  (32)
+	Exp : Exp . EQUAL Exp  (33)
+
+	COMMA  reduce 30
+	EQUAL  reduce 30
+	LESS  reduce 30
+	MINUS  reduce 30
+	PLUS  reduce 30
+	RBRACK  reduce 30
+	RPAR  reduce 30
+	SEMICOLON  reduce 30
+
+
+state 72
+	Exp : Lval ASSIGN Exp .  (29)
+	Exp : Exp . PLUS Exp  (30)
+	Exp : Exp . MINUS Exp  (31)
+	Exp : Exp . LESS Exp  (32)
+	Exp : Exp . EQUAL Exp  (33)
+
+	EQUAL  shift 47
+	LESS  shift 48
+	MINUS  shift 49
+	PLUS  shift 50
+	COMMA  reduce 29
+	RBRACK  reduce 29
+	RPAR  reduce 29
+	SEMICOLON  reduce 29
+
+
+state 73
+	Sids : Sid COMMA Sids .  (13)
+
+	.  reduce 13
+
+
+state 74
+	Lval : ID LBRACK Exp RBRACK .  (42)
+
+	.  reduce 42
+
+
+state 75
+	Exps1 : Exp COMMA . Exps  (39)
+	Exps : .  (36)
+
+	CHARCONST  shift 19
+	ID  shift 20
+	LPAR  shift 23
+	NUM  shift 24
+	STRINGCONST  shift 26
+	RPAR  reduce 36
+
+	Exp  goto 56
+	Exps  goto 81
+	Exps1  goto 58
+	Lval  goto 31
+
+
+state 76
+	Exp : ID LPAR Exps RPAR .  (34)
+
+	.  reduce 34
+
+
+state 77
 	Stat : IF LPAR Exp RPAR . Stat  (17)
 	Stat : IF LPAR Exp RPAR . Stat ELSE Stat  (18)
 
@@ -843,27 +930,30 @@ state 70
 	NUM  shift 24
 	RETURN  shift 25
 	STRINGCONST  shift 26
-	WHILE  shift 27
+	THROW  shift 27
+	TRY  shift 28
+	WHILE  shift 29
 	.  error
 
-	Exp  goto 28
-	Lval  goto 29
-	Stat  goto 75
+	Exp  goto 30
+	Lval  goto 31
+	Stat  goto 82
 
 
-state 71
-	Stats : Stat Stats .  (21)
-
-	.  reduce 21
-
-
-state 72
+state 78
 	Stat : LBRACE Decs1 Stats RBRACE .  (15)
 
 	.  reduce 15
 
 
-state 73
+state 79
+	Stat : TRY Stats CATCH ID . COLON Stat  (22)
+
+	COLON  shift 83
+	.  error
+
+
+state 80
 	Stat : WHILE LPAR Exp RPAR . Stat  (19)
 
 	CHARCONST  shift 19
@@ -874,25 +964,28 @@ state 73
 	NUM  shift 24
 	RETURN  shift 25
 	STRINGCONST  shift 26
-	WHILE  shift 27
+	THROW  shift 27
+	TRY  shift 28
+	WHILE  shift 29
 	.  error
 
-	Exp  goto 28
-	Lval  goto 29
-	Stat  goto 76
+	Exp  goto 30
+	Lval  goto 31
+	Stat  goto 84
 
 
-state 74
-	Exps1 : Exp COMMA Exps .  (37)
+state 81
+	Exps1 : Exp COMMA Exps .  (39)
 
-	.  reduce 37
+	.  reduce 39
 
 
-state 75
+state 82
 	Stat : IF LPAR Exp RPAR Stat .  (17)
 	Stat : IF LPAR Exp RPAR Stat . ELSE Stat  (18)
 
-	ELSE  shift 77
+	ELSE  shift 85
+	CATCH  reduce 17
 	CHAR  reduce 17
 	CHARCONST  reduce 17
 	EOF  reduce 17
@@ -905,16 +998,39 @@ state 75
 	RBRACE  reduce 17
 	RETURN  reduce 17
 	STRINGCONST  reduce 17
+	THROW  reduce 17
+	TRY  reduce 17
 	WHILE  reduce 17
 
 
-state 76
+state 83
+	Stat : TRY Stats CATCH ID COLON . Stat  (22)
+
+	CHARCONST  shift 19
+	ID  shift 20
+	IF  shift 21
+	LBRACE  shift 22
+	LPAR  shift 23
+	NUM  shift 24
+	RETURN  shift 25
+	STRINGCONST  shift 26
+	THROW  shift 27
+	TRY  shift 28
+	WHILE  shift 29
+	.  error
+
+	Exp  goto 30
+	Lval  goto 31
+	Stat  goto 86
+
+
+state 84
 	Stat : WHILE LPAR Exp RPAR Stat .  (19)
 
 	.  reduce 19
 
 
-state 77
+state 85
 	Stat : IF LPAR Exp RPAR Stat ELSE . Stat  (18)
 
 	CHARCONST  shift 19
@@ -925,19 +1041,27 @@ state 77
 	NUM  shift 24
 	RETURN  shift 25
 	STRINGCONST  shift 26
-	WHILE  shift 27
+	THROW  shift 27
+	TRY  shift 28
+	WHILE  shift 29
 	.  error
 
-	Exp  goto 28
-	Lval  goto 29
-	Stat  goto 78
+	Exp  goto 30
+	Lval  goto 31
+	Stat  goto 87
 
 
-state 78
+state 86
+	Stat : TRY Stats CATCH ID COLON Stat .  (22)
+
+	.  reduce 22
+
+
+state 87
 	Stat : IF LPAR Exp RPAR Stat ELSE Stat .  (18)
 
 	.  reduce 18
 
 
-28 terminals, 16 nonterminals
-42 grammar rules, 79 states
+32 terminals, 16 nonterminals
+44 grammar rules, 88 states

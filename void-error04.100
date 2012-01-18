@@ -1,9 +1,0 @@
-/* void-error04.100 */
-/* Address of reference variable taken */
-
-int main()
-{
-  int *x;
-  &x;
-  return 0;
-}
