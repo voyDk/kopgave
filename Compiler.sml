@@ -346,7 +346,9 @@ struct
         val endLabel = "_tryblockEnd_"^newName()
         val handlerLabel = "_handler_"^newName()
         val vtable1 = (case x of 
-                         S100.Val (s,p) => (s,(Type.Int, "2"))) :: vtable
+                         S100.Val (s,p) => (s,(Type.Int, "2"))
+			| _ => raise Error ("Should never match",(0,0)))
+			:: vtable
         val code1 = compileStat stat vtable1 ftable exitLabel handler
         val code2 = List.concat
                     (List.map (fn s => compileStat s vtable ftable exitLabel handlerLabel) stats)
