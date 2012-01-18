@@ -1,0 +1,12 @@
+/* except-test3.100 */
+/* Uncaught exception 1337 */
+
+int main() {
+  foo();
+  
+  return 0;
+}
+
+int foo() {
+  throw 1337;
+}

@@ -1,0 +1,6 @@
+/* except-test1.100 */
+/* Uncaught exception 1337 */
+
+int main() {
+  throw 1337;
+}

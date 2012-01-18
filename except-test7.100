@@ -1,0 +1,22 @@
+/* except-test5.100 */
+/* output 42 */
+
+int main() {
+  try 
+    foo();
+  catch s : putint(s);  
+
+  return 0;
+}
+
+int foo() {
+  try
+    bar();
+  catch x : throw 42;
+
+  return 0;
+}
+
+int bar() {
+  throw 1337;
+}

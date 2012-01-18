@@ -1,0 +1,8 @@
+/* except-test6.100 */
+/* output 101 */
+
+int main() {
+  throw 'e';
+  
+  return 0;
+}

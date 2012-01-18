@@ -1,0 +1,8 @@
+/* except-test2.100 */
+/* output 1337 */
+
+int main() {
+  try 
+    throw 1337;
+  catch s : putint(s);
+}
