@@ -336,7 +336,7 @@ struct
 	end
     | S100.Throw (e,p) =>
       let
-        val (_,code0) = compileExp e vtable ftable "2" handler
+        val (_,code0) = compileExp e vtable ftable "26" handler
       in
         code0 @ [Mips.J handler] 
       end
@@ -346,14 +346,16 @@ struct
         val endLabel = "_tryblockEnd_"^newName()
         val handlerLabel = "_handler_"^newName()
         val vtable1 = (case x of 
-                         S100.Val (s,p) => (s,(Type.Int, "2"))) :: vtable
+                         S100.Val (s,p) => (s,(Type.Int, "26"))) :: vtable
         val code1 = compileStat stat vtable1 ftable exitLabel handler
         val code2 = List.concat
                     (List.map (fn s => compileStat s vtable ftable exitLabel handlerLabel) stats)
       in
         [Mips.J startLabel, 
          Mips.LABEL handlerLabel]
+        @ [Mips.LI ("3", "0")] (* reset exception flag for function calls *)
         @ code1
+        @ [Mips.J endLabel]
         @ [Mips.LABEL startLabel]
         @ code2
         @ [Mips.LABEL endLabel]
@@ -428,7 +430,7 @@ struct
           val body = compileStat body vtable ftable exit localHandler
           val (body1, _, maxr,spilled)  (* call register allocator *)
             = RegAlloc.registerAlloc
-                (parcode @ body @ returncode) [] 2 maxCaller maxReg 0
+                (parcode @ body @ returncode) ["2"] 2 maxCaller maxReg 0
           val (savecode, restorecode, offset) = (* save/restore callee-saves *)
                 stackSave (maxCaller+1) (maxr+1) [] [] (4*spilled)
 		(* save one extra callee-saves register for saving SP *)
@@ -472,8 +474,8 @@ struct
        Mips.GLOBL "main",
        Mips.LA (HP, "_heap_")]    (* initialise heap pointer *)
       @ [Mips.JAL ("main",[]),    (* run program *)
-	 Mips.LI ("2","10"),      (* syscall control = 10 *)
-         Mips.SYSCALL]            (* exit *)
+         Mips.BNE ("3","0","uncaughtException"),
+         Mips.J "_terminate_"]
       @ funsCode		  (* code for functions *)
 
       @ [Mips.LABEL "putint",     (* putint function *)
